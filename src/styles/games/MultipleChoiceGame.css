@@ -6,48 +6,66 @@
   font-size: 1.15rem;
   font-weight: 700;
   text-align: center;
-  margin-bottom: 1rem;
-  color: #5b3a7d;
+  margin-bottom: 1.5rem;
+  color: #334155;
 }
 
 .mc-options {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 14px;
 }
 
 .mc-option {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 15px;
   text-align: left;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 244, 255, 0.82));
-  color: #4a3268;
-  border: 1px solid rgba(170, 118, 214, 0.25);
-  box-shadow: 0 10px 24px rgba(127, 83, 177, 0.15);
-  padding: 14px 16px;
-  border-radius: 18px;
+  background: #22c55e;
+  color: white;
+  border: none;
+  box-shadow: 0 5px 0 #16a34a, 0 8px 10px rgba(0, 0, 0, 0.15);
+  padding: 14px 20px;
+  border-radius: 99px; /* Rounded pill shape */
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
 }
 
 .mc-option:hover:not(:disabled) {
-  transform: translateY(-2px) scale(1.01);
-  box-shadow: 0 14px 28px rgba(127, 83, 177, 0.2);
+  transform: translateY(2px);
+  box-shadow: 0 3px 0 #16a34a, 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.mc-option:active:not(:disabled) {
+  transform: translateY(5px);
+  box-shadow: 0 0 0 transparent;
 }
 
 .mc-badge {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ffde8b, #ff9cd3);
-  color: #4a3268;
-  font-weight: 800;
+  background: white;
+  color: #16a34a;
+  font-weight: 900;
   flex: 0 0 auto;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
 }
 
 @media (max-width: 640px) {
   .mc-options {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
+}
+.mc-question {
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #ffffff !important;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
 }

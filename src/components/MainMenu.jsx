@@ -1,27 +1,33 @@
+﻿import React from 'react'
 import '../styles/MainMenu.css'
 
-export default function MainMenu({ onStart }) {
+export default function MainMenu({ playerProfile, onNewGame, onContinue, onSettings }) {
   return (
-    <div className="main-menu">
-      <div className="menu-container">
-        <h1 className="title">🎮 HocBangVN</h1>
-        <p className="subtitle">Learn English with Visual Novel & Mini Games</p>
-        
-        <div className="menu-content">
-          <div className="character-teaser">
-            <p className="teaser-text">Bắt đầu hành trình học tiếng Anh của bạn...</p>
-          </div>
+    <div className="main-menu-container dark-fantasy-menu">
+      <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop" alt="Dark Fantasy Background" className="main-bg animate-slow-zoom" />
 
-          <button className="btn-start" onClick={onStart}>
-            ▶️ Bắt Đầu
-          </button>
+      <div className="title-card dark-title">
+        <h1 className="game-title">
+          <span className="title-en glow">SHADOW</span>
+          <span className="title-vn gold-text">CASTLE</span>
+        </h1>
+        <p className="subtitle">Hành trình đánh bại chúa tể bóng tối học đường</p>
+      </div>
 
-          <div className="menu-info">
-            <p>📚 Học các thì tiếng Anh qua câu chuyện</p>
-            <p>🎮 Mini game ôn luyện kiến thức</p>
-            <p>✨ Giao diện giống Visual Novel</p>
-          </div>
-        </div>
+      <div className="center-menu-content basic-menu shadow-menu">
+        {playerProfile && (
+           <button className="start-btn pulse fantasy-btn main-btn" onClick={onContinue}>
+             ⟡ Tiếp Tục Hành Trình ⟡
+           </button>
+        )}
+
+        <button className="start-btn new-game-btn fantasy-btn" onClick={onNewGame}>
+          {playerProfile ? '⟡ Khởi Đầu Lại (Xóa Dữ Liệu)' : '⟡ Khởi Hành Mới'}
+        </button>
+
+        <button className="start-btn settings-btn fantasy-btn" onClick={onSettings}>
+          ⟡ Cài Đặt ⟡
+        </button>
       </div>
     </div>
   )

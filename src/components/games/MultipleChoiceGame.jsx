@@ -20,7 +20,7 @@ export default function MultipleChoiceGame({ question, options, answerIndex, onC
             onClick={() => handlePick(index)}
             disabled={disabled}
           >
-            <span className="mc-badge">{String.fromCharCode(65 + index)}</span>
+            <span className="mc-badge">{index + 1}</span>
             <span>{option}</span>
           </button>
         ))}

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import '../../styles/games/FillBlanksGame.css'
 
 export default function FillBlanksGame({ question, answer, onComplete, disabled }) {
@@ -13,28 +13,31 @@ export default function FillBlanksGame({ question, answer, onComplete, disabled 
     e.preventDefault()
     if (submitted) return
     setSubmitted(true)
-    const isCorrect = input.trim().toLowerCase() === answer.trim().toLowerCase()
+    const isCorrect = input.trim().toLowerCase() === (answer || '').trim().toLowerCase()
     onComplete({
       success: isCorrect,
       message: isCorrect ? 'Điền đúng rồi!' : `Đáp án đúng: ${answer}`
     })
   }
 
+  // Split by any sequence of 3 or more underscores
+  const parts = question.split(/_{3,}/);
+
   return (
     <form className="fill-blanks-game" onSubmit={handleSubmit}>
       <div className="blank-display">
         <p className="blank-sentence">
-          {question.split('___').map((part, index) => (
+          {parts.map((part, index) => (
             <span key={index}>
               {part}
-              {index < question.split('___').length - 1 && (
+              {index < parts.length - 1 && (
                 <input
                   type="text"
                   value={input}
                   onChange={handleChange}
                   disabled={disabled || submitted}
                   className="blank-input"
-                  autoFocus
+                  autoFocus={index === 0}
                 />
               )}
             </span>

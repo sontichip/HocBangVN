@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+php-backend/vendor/
+server/node_modules/
+
+# build outputs
+dist/
+php-backend/.phpunit.result.cache
+
+# environment secrets
+.env
+*.env
+php-backend/.env
+server/.env
+
+# runtime upload and generated data
+server/uploads/
+server/user_lessons/
+
+# editor/system
+.DS_Store
+Thumbs.db
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

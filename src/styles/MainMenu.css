@@ -1,86 +1,123 @@
-.main-menu {
+﻿.main-menu-container {
   min-height: 100vh;
+  width: 100vw;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-.menu-container {
-  background: white;
-  border-radius: 20px;
-  padding: 40px;
-  max-width: 600px;
+.main-bg {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
   width: 100%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  filter: brightness(0.6) contrast(1.1);
+}
+
+.dark-title {
+  position: absolute;
+  top: 15%;
+  z-index: 2;
   text-align: center;
 }
 
-.title {
-  font-size: 3.5rem;
-  margin-bottom: 10px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.title-en.glow {
+  color: #fff;
+  text-shadow: 0 0 20px #818cf8, 0 0 40px #818cf8;
+  font-size: 5rem;
+  letter-spacing: 5px;
+  display: block;
 }
 
-.subtitle {
-  font-size: 1.3rem;
-  color: #666;
-  margin-bottom: 30px;
-  font-style: italic;
+.title-vn.gold-text {
+  color: #fbbf24;
+  text-shadow: 0 0 15px rgba(245, 158, 11, 0.6);
+  font-size: 3rem;
+  letter-spacing: 2px;
+  display: block;
+  margin-top: -15px;
 }
 
-.menu-content {
+.dark-title .subtitle {
+  color: #cbd5e1;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  margin-top: 15px;
+  text-shadow: 0 2px 4px #000;
+}
+
+.center-menu-content {
+  position: absolute;
+  top: 55%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 30px;
-}
-
-.character-teaser {
-  font-size: 4rem;
-  padding: 20px;
-  background: #f0f0f0;
-  border-radius: 15px;
+  gap: 25px;
   width: 100%;
-  min-height: 100px;
-  display: flex;
+  max-width: 450px;
   align-items: center;
-  justify-content: center;
+  z-index: 2;
 }
 
-.teaser-text {
-  font-size: 1.2rem;
-  color: #333;
-}
-
-.btn-start {
+.start-btn.fantasy-btn {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(5px);
+  border: 1px solid #4f46e5;
+  color: #e2e8f0;
+  padding: 16px 30px;
   font-size: 1.3rem;
-  padding: 15px 40px;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  color: white;
-  width: 250px;
-  border-radius: 50px;
-}
-
-.btn-start:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(99, 102, 241, 0.4);
-}
-
-.menu-info {
-  background: #f0f4ff;
-  padding: 20px;
-  border-radius: 15px;
-  border-left: 4px solid var(--primary-color);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.5), inset 0 0 10px rgba(79, 70, 229, 0.2);
   width: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
-.menu-info p {
-  margin: 8px 0;
-  font-size: 1rem;
-  color: #333;
+.start-btn.fantasy-btn:hover {
+  background: rgba(30, 41, 59, 0.9);
+  border-color: #818cf8;
+  box-shadow: 0 0 25px rgba(99, 102, 241, 0.6), inset 0 0 15px rgba(79, 70, 229, 0.4);
+  transform: scale(1.05);
+  color: #fff;
+}
+
+.start-btn.fantasy-btn.main-btn {
+  border-color: #fbbf24;
+  color: #fbbf24;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.3), inset 0 0 10px rgba(245, 158, 11, 0.2);
+}
+
+.start-btn.fantasy-btn.main-btn:hover {
+  border-color: #fde68a;
+  color: #fff;
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.6), inset 0 0 20px rgba(245, 158, 11, 0.4);
+}
+
+.start-btn.pulse {
+  animation: pulse-glow-dark 3s infinite;
+}
+
+@keyframes pulse-glow-dark {
+  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+  70% { box-shadow: 0 0 0 20px rgba(245, 158, 11, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+}
+
+.animate-slow-zoom {
+  animation: zoom-in-out 30s ease-in-out infinite alternate;
+}
+
+@keyframes zoom-in-out {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.1); }
 }

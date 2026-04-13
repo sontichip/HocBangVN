@@ -1,21 +1,24 @@
 .dialog-box {
-  background: white;
+  background: rgba(0, 10, 30, 0.7);
+  backdrop-filter: blur(12px);
+  border: 2px solid #3b82f6;
   border-radius: 15px;
   padding: 30px;
+  position: relative;
   max-width: 700px;
   width: 100%;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-  animation: slideUp 0.5s ease;
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.5), inset 0 0 15px rgba(59, 130, 246, 0.2);
+  animation: slideInFromLeft 0.5s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-@keyframes slideUp {
-  from {
+@keyframes slideInFromLeft {
+  0% {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateX(-50px) scale(0.95);
   }
-  to {
+  100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(0) scale(1);
   }
 }
 
@@ -25,7 +28,7 @@
   gap: 15px;
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 2px solid #eee;
+  border-bottom: 2px solid rgba(59, 130, 246, 0.4);
 }
 
 .character-avatar {
@@ -35,14 +38,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f0f4ff;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid #3b82f6;
   border-radius: 10px;
 }
 
 .character-name {
   font-size: 1.3rem;
-  color: var(--primary-color);
+  color: #60a5fa;
   margin: 0;
+  text-shadow: 0 0 5px rgba(96, 165, 250, 0.5);
 }
 
 .dialog-message {
@@ -52,17 +57,18 @@
 .message-text {
   font-size: 1.1rem;
   line-height: 1.6;
-  color: var(--text-dark);
+  color: #ffffff;
   margin: 0;
   font-style: italic;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .dialog-info {
-  background: #f9fafb;
+  background: rgba(59, 130, 246, 0.15);
   padding: 15px;
   border-radius: 10px;
   margin-bottom: 25px;
-  border-left: 3px solid var(--primary-color);
+  border-left: 3px solid #3b82f6;
 }
 
 .info-row {
@@ -75,13 +81,13 @@
 
 .info-label {
   font-weight: 600;
-  color: var(--primary-color);
+  color: #60a5fa;
   display: block;
   margin-bottom: 5px;
 }
 
 .info-text {
-  color: var(--text-dark);
+  color: #f3f4f6;
   margin: 0;
   line-height: 1.5;
   font-size: 0.95rem;
@@ -100,3 +106,57 @@
   transform: translateY(-3px);
   box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
 }
+.true-vn-dialog {
+  background: rgba(0, 10, 30, 0.7);
+  backdrop-filter: blur(12px);
+  border: 2px solid #3b82f6;
+  border-radius: 15px;
+  padding: 30px;
+  max-width: 96vw; /* Allow it to be almost full screen wide */
+  width: 96vw;     /* Force horizontal stretch */
+  box-sizing: border-box;
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.4), inset 0 0 15px rgba(59, 130, 246, 0.1);
+  animation: slideUp 0.5s ease;
+  position: relative;
+  min-height: 25vh; /* Keep it nice and flat, not too tall */
+  margin: 0 auto;
+}
+
+.vn-btn-next {
+  margin-top: 20px;
+}
+
+/* Add to end of DialogBox.css map */
+
+.font-size-small .message-text {
+  font-size: 14px!important;
+}
+
+.font-size-medium .message-text {
+  font-size: 18px!important;
+}
+
+.font-size-large .message-text {
+  font-size: 24px!important;
+}
+
+.font-size-small .character-name {
+  font-size: 16px!important;
+}
+
+.font-size-medium .character-name {
+  font-size: 20px!important;
+}
+
+.font-size-large .character-name {
+  font-size: 26px!important;
+}
+
+
+.typewriter-cursor { animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+.avatar-talking { animation: talkingBounce 0.2s infinite alternate ease-in-out; border-color: #feca57 !important; box-shadow: 0 0 15px #feca57 !important; }
+@keyframes talkingBounce { 0% { transform: translateY(0); } 100% { transform: translateY(-8px); } }
+.blinking-next-btn { animation: blinkArrow 1s infinite alternate; background: #feca57; color: #222; font-weight: bold; border-radius: 20px; border: 2px solid #fff; box-shadow: 0 0 10px rgba(254, 202, 87, 0.8); }
+@keyframes blinkArrow { 0% { transform: translateY(0) scale(1); } 100% { transform: translateY(3px) scale(1.05); } }

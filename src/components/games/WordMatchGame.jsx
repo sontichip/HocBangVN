@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import '../../styles/games/WordMatchGame.css'
 
 export default function WordMatchGame({ pairs, onComplete, disabled }) {
@@ -13,36 +13,36 @@ export default function WordMatchGame({ pairs, onComplete, disabled }) {
   const handleSelectRight = (rightValue) => {
     if (disabled || selectedLeft === null) return
 
-    const pair = pairs.find(p => p.left === selectedLeft && p.right === rightValue)
-    
-    if (matches.some(m => m.left === selectedLeft && m.right === rightValue)) {
+    const pair = pairs.find(p => p.a === selectedLeft && p.b === rightValue)
+    if (matches.some(m => m.a === selectedLeft && m.b === rightValue)) {
       return
     }
 
-    setMatches([...matches, { left: selectedLeft, right: rightValue, correct: pair?.correct || false }])
+    const newMatches = [...matches, { a: selectedLeft, b: rightValue, correct: !!pair }]
+    setMatches(newMatches)
     setSelectedLeft(null)
 
-    if (matches.length + 1 === pairs.length) {
-      const allCorrect = [...matches, { correct: pair?.correct || false }].every(m => m.correct)
+    if (newMatches.length === pairs.length) {
+      const allCorrect = newMatches.every(m => m.correct)
       onComplete({
         success: allCorrect,
-        message: allCorrect ? 'Bạn ghép đúng tất cả!' : 'Một số ghép chưa đúng.'
+        message: allCorrect ? 'Tuyệt vời, chính xác 100%!' : 'Một số cặp chưa đúng.'
       })
     }
   }
 
-  const matchedLefts = matches.map(m => m.left)
-  const matchedRights = matches.map(m => m.right)
-  const lefts = [...new Set(pairs.map(p => p.left))]
-  const rights = [...new Set(pairs.map(p => p.right))]
+  const matchedLefts = matches.map(m => m.a)
+  const matchedRights = matches.map(m => m.b)
+  const lefts = [...new Set(pairs.map(p => p.a))]
+  const rights = [...new Set(pairs.map(p => p.b))]
 
   return (
     <div className="word-match-game">
       <div className="match-columns">
         <div className="match-column left">
-          {lefts.map(left => (
+          {lefts.map((left, idx) => (
             <button
-              key={left}
+              key={`left-${idx}`}
               className={`match-item ${selectedLeft === left ? 'selected' : ''} ${matchedLefts.includes(left) ? 'matched' : ''}`}
               onClick={() => handleSelectLeft(left)}
               disabled={disabled || matchedLefts.includes(left)}
@@ -59,9 +59,9 @@ export default function WordMatchGame({ pairs, onComplete, disabled }) {
         </div>
 
         <div className="match-column right">
-          {rights.map(right => (
+          {rights.map((right, idx) => (
             <button
-              key={right}
+              key={`right-${idx}`}
               className={`match-item ${matchedRights.includes(right) ? 'matched' : ''}`}
               onClick={() => handleSelectRight(right)}
               disabled={disabled || matchedRights.includes(right)}
@@ -73,7 +73,7 @@ export default function WordMatchGame({ pairs, onComplete, disabled }) {
       </div>
 
       <div className="match-progress">
-        <p>Matching: {matches.length}/{pairs.length}</p>
+        <p>Ghép cặp: {matches.length}/{pairs.length}</p>
       </div>
     </div>
   )

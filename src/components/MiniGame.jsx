@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import MultipleChoiceGame from './games/MultipleChoiceGame'
 import WordMatchGame from './games/WordMatchGame'
 import SentenceBuilderGame from './games/SentenceBuilderGame'
@@ -42,8 +42,8 @@ export default function MiniGame({ game, onComplete }) {
         )}
         {game.type === 'sentenceBuilder' && (
           <SentenceBuilderGame
-            sentence={game.answer}
-            words={game.words}
+            sentence={game.answer || (game.correctOrder ? game.correctOrder.join(' ') : '')}
+            words={game.words || game.correctOrder || []}
             onComplete={handleGameComplete}
             disabled={isAnswered}
           />

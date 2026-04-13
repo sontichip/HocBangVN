@@ -13,37 +13,25 @@ export const presentContinuousLesson = {
   visualNovel: [
     {
       id: 1,
-      speaker: 'Mia',
-      text: 'Look! I am drawing a magic flower right now.',
-      choices: [
-        { text: 'You are drawing a flower.', next: 2 },
-        { text: 'You drawing a flower.', next: 3 }
-      ]
-    },
-    {
-      id: 2,
-      speaker: 'Mia',
-      text: 'Yes! I am drawing now. Can you help me choose the right sentence?',
+      speaker: 'System Message',
+      text: 'Hiện tại tôi đang để lời thoại của hệ thống để hướng dẫn bạn cách chọn thì phù hợp cho câu chuyện sắp tới với Hana.',
       choices: []
     },
     {
-      id: 3,
-      speaker: 'Mia',
-      text: 'Almost! Remember we need am/is/are + V-ing.',
-      choices: [
-        { text: 'You are drawing a flower.', next: 2 }
-      ]
+      id: 2,
+      speaker: 'Hana',
+      text: 'Look! I am drawing a magic flower right now.',
+      choices: []
     }
   ],
   miniGames: [
     {
       type: 'multipleChoice',
-      question: 'Which sentence is in Present Continuous?',
+      question: 'Find the correct Present Continuous form:',
       options: [
-        'She plays the guitar every day.',
-        'She is playing the guitar now.',
-        'She played the guitar yesterday.',
-        'She will play the guitar tomorrow.'
+        'She forms a group every day.',
+        'She is forming a group now.',
+        'She formed a group yesterday.'
       ],
       answerIndex: 1
     },

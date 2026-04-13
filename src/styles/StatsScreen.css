@@ -1,0 +1,33 @@
+﻿.stats-screen {
+  position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: #f1f2f6; color: #2f3542; z-index: 60;
+  display: flex; flex-direction: column; align-items: center;
+}
+.stats-header {
+  width: 100%; padding: 20px; display: flex; align-items: center; justify-content: space-between;
+  background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+.stats-container {
+  width: 80%; max-width: 900px; padding: 40px 0;
+  display: flex; flex-direction: column; gap: 30px;
+}
+.stats-avatar-section {
+  text-align: center; background: white; padding: 30px; border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+.stats-avatar { width: 100px; height: 100px; margin: 0 auto 10px; font-size: 5rem; line-height: 100px; display: flex; align-items: center; justify-content: center; }
+.stats-avatar-section h2 { margin: 0; font-size: 2rem; color: #1e90ff; text-transform: uppercase; }
+.level-title { margin-top: 5px; color: #747d8c; font-weight: bold; }
+
+.stats-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
+}
+.stat-box {
+  background: white; padding: 25px; border-radius: 20px;
+  display: flex; align-items: center; gap: 20px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.03); transition: 0.3s;
+}
+.stat-box:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+.stat-icon { font-size: 3rem; background: #f1f2f6; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; border-radius: 20px; }
+.stat-info h4 { margin: 0 0 5px 0; color: #57606f; font-size: 1.1rem; }
+.stat-info p { margin: 0; font-size: 1.3rem; font-weight: bold; color: #2f3542; }

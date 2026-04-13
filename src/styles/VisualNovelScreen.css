@@ -285,3 +285,211 @@
     grid-template-columns: 1fr;
   }
 }
+/* --- SYSTEM NAV BAR (Top-left & Top-right) --- */
+.system-nav-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 20px;
+  z-index: 10;
+}
+
+.exp-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 250px;
+  background: white;
+  padding: 6px 12px;
+  border-radius: 99px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.exp-icon {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #22c55e;
+}
+
+.exp-track {
+  flex: 1;
+  height: 12px;
+  background: #e5e7eb;
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.exp-fill {
+  height: 100%;
+  background: #22c55e;
+  border-radius: 99px;
+  width: 45%; 
+}
+
+.sys-btn-group {
+  display: flex;
+  gap: 12px;
+}
+
+.sys-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #2563eb;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.sys-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 transparent;
+}
+/* === TRUE VN LAYOUT STYLES === */
+.true-vn-layout {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  background: url('/background.png') no-repeat center center;
+  background-size: cover;
+}
+
+/* TOP NAV BAR */
+.vn-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 50;
+  box-sizing: border-box;
+}
+
+/* GEAR MENU */
+.gear-menu-container {
+  position: relative;
+}
+
+.gear-btn {
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid #3b82f6;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, background 0.2s;
+}
+
+.gear-btn:hover {
+  transform: rotate(45deg);
+  background: #ffffff;
+}
+
+.gear-dropdown {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 2px solid #3b82f6;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  min-width: 120px;
+  animation: slideDown 0.2s ease-out forwards;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.gear-dropdown .sys-btn {
+  width: 100%;
+  text-align: center;
+  margin: 0;
+}
+
+/* EXP BAR TOP RIGHT */
+.true-vn-exp {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px 16px;
+  border-radius: 99px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* SPRITE CONTAINER */
+.vn-sprite-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  height: 60vh;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.vn-sprite-img {
+  max-height: 100%;
+  max-width: 90vw;
+  object-fit: contain;
+  /* Add a soft glow or shadow so it separates from bg */
+  filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.6));
+}
+
+/* DIALOG CONTAINERS */
+.vn-dialog-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  z-index: 40;
+  box-sizing: border-box;
+}
+
+.vn-inline-choices {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.minigame-in-dialog {
+  margin-top: 15px;
+  width: 100%;
+  /* Optional constraints if needed */
+}
+.minigame-in-dialog h2,
+.minigame-in-dialog h3,
+.minigame-in-dialog p,
+.minigame-in-dialog form label,
+.minigame-in-dialog .game-question {
+  color: #fff !important;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+}
