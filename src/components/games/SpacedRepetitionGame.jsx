@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
 
+const PASSING_RATIO = 0.6
+
 export default function SpacedRepetitionGame({ cards, onComplete, disabled }) {
   const initialDeck = useMemo(
     () =>
@@ -23,7 +25,7 @@ export default function SpacedRepetitionGame({ cards, onComplete, disabled }) {
     const total = nextStats.right + nextStats.wrong
     const ratio = total === 0 ? 0 : nextStats.right / total
     onComplete({
-      success: ratio >= 0.6,
+      success: ratio >= PASSING_RATIO,
       message: `Bạn nhớ đúng ${nextStats.right}/${total} thẻ.`
     })
   }

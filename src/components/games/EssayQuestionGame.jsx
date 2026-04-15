@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
-const API_BASE = 'http://localhost:5174'
+const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5174').replace(/\/$/, '')
+const PASSING_SCORE = 6
 
 export default function EssayQuestionGame({ prompt, rubric, token, onComplete, disabled }) {
   const [answer, setAnswer] = useState('')
@@ -26,7 +27,7 @@ export default function EssayQuestionGame({ prompt, rubric, token, onComplete, d
       if (!res.ok) throw new Error(data.error || 'Chấm điểm thất bại')
       setResult(data)
       onComplete({
-        success: Number(data.score) >= 6,
+        success: Number(data.score) >= PASSING_SCORE,
         message: `Điểm: ${data.score}/10`
       })
     } catch (err) {

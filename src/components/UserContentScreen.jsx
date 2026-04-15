@@ -7,7 +7,7 @@ import DictationGame from './games/DictationGame'
 import SpacedRepetitionGame from './games/SpacedRepetitionGame'
 import EssayQuestionGame from './games/EssayQuestionGame'
 
-const API_BASE = 'http://localhost:5174'
+const API_BASE = (import.meta.env.VITE_API_BASE || 'http://localhost:5174').replace(/\/$/, '')
 
 function getActivities(lesson) {
   const generated = lesson?.generated
@@ -105,7 +105,7 @@ export default function UserContentScreen({ onBack, token }) {
   const [result, setResult] = useState(null)
   const [myLessons, setMyLessons] = useState([])
   const [activeLessonId, setActiveLessonId] = useState(null)
-  const [currentIdx, setCurrentIdx] = useState(0)
+  const [currentActivityIndex, setCurrentActivityIndex] = useState(0)
   const [answers, setAnswers] = useState({})
 
   const activeLesson = useMemo(
@@ -113,13 +113,13 @@ export default function UserContentScreen({ onBack, token }) {
     [myLessons, activeLessonId]
   )
   const activities = useMemo(() => getActivities(activeLesson), [activeLesson])
-  const currentActivity = activities[currentIdx]
-  const finished = activeLesson && activities.length > 0 && currentIdx >= activities.length
+  const currentActivity = activities[currentActivityIndex]
+  const finished = activeLesson && activities.length > 0 && currentActivityIndex >= activities.length
   const score = useMemo(() => Object.values(answers).filter((item) => item?.success).length, [answers])
 
   const resetPractice = (lessonId = null) => {
     setActiveLessonId(lessonId)
-    setCurrentIdx(0)
+    setCurrentActivityIndex(0)
     setAnswers({})
   }
 
@@ -165,12 +165,12 @@ export default function UserContentScreen({ onBack, token }) {
   }
 
   const handleCompleteActivity = (activityResult) => {
-    setAnswers((prev) => ({ ...prev, [currentIdx]: activityResult }))
+    setAnswers((prev) => ({ ...prev, [currentActivityIndex]: activityResult }))
   }
 
   const nextActivity = () => {
-    if (!answers[currentIdx]) return
-    setCurrentIdx((idx) => idx + 1)
+    if (!answers[currentActivityIndex]) return
+    setCurrentActivityIndex((idx) => idx + 1)
   }
 
   return (
@@ -226,18 +226,18 @@ export default function UserContentScreen({ onBack, token }) {
           ) : (
             <div style={{ display: 'grid', gap: 12 }}>
               <div style={{ opacity: 0.8 }}>
-                Bài {currentIdx + 1}/{activities.length} · {currentActivity?.title || currentActivity?.type}
+                Bài {currentActivityIndex + 1}/{activities.length} · {currentActivity?.title || currentActivity?.type}
               </div>
               <ActivityRenderer
                 activity={currentActivity}
-                disabled={!!answers[currentIdx]}
+                disabled={!!answers[currentActivityIndex]}
                 token={token}
                 onComplete={handleCompleteActivity}
               />
-              {answers[currentIdx] ? (
+              {answers[currentActivityIndex] ? (
                 <div style={{ background: 'rgba(15,23,42,0.3)', padding: 10, borderRadius: 10 }}>
-                  <p style={{ margin: 0 }}>{answers[currentIdx].success ? '✅ Đúng' : '❌ Chưa đúng'}</p>
-                  {answers[currentIdx].message ? <p style={{ marginBottom: 0 }}>{answers[currentIdx].message}</p> : null}
+                  <p style={{ margin: 0 }}>{answers[currentActivityIndex].success ? '✅ Đúng' : '❌ Chưa đúng'}</p>
+                  {answers[currentActivityIndex].message ? <p style={{ marginBottom: 0 }}>{answers[currentActivityIndex].message}</p> : null}
                   <button style={{ marginTop: 8 }} onClick={nextActivity}>Tiếp tục</button>
                 </div>
               ) : null}
