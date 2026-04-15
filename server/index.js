@@ -2,6 +2,7 @@ import express from 'express'
 import multer from 'multer'
 import fs from 'fs'
 import path from 'path'
+import dotenv from 'dotenv'
 import { fileURLToPath } from 'url'
 import fetch from 'node-fetch'
 import { v4 as uuidv4 } from 'uuid'
@@ -9,6 +10,9 @@ import rateLimit from 'express-rate-limit'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
+
+// Load workspace .env if present (convenience for local dev)
+dotenv.config({ path: path.join(__dirname, '..', '.env') })
 
 // ensure uploads and user_lessons folders exist
 const uploadsDir = path.join(__dirname, 'uploads')
@@ -435,6 +439,93 @@ app.post('/api/login', authLimiter, (req, res) => {
   res.json({ token, username })
 })
 
+// Google OAuth start: redirects to Google's consent screen
+app.get('/auth/google', (req, res) => {
+  const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID
+  const redirectBase = `${req.protocol}://${req.get('host')}`
+  const redirectUri = `${redirectBase}/auth/google/callback`
+  if (!clientId) return res.status(500).send('GOOGLE_OAUTH_CLIENT_ID is not configured on server')
+  const state = ''
+  const url = new URL('https://accounts.google.com/o/oauth2/v2/auth')
+  url.searchParams.set('client_id', clientId)
+  url.searchParams.set('response_type', 'code')
+  url.searchParams.set('scope', 'openid email profile')
+  url.searchParams.set('redirect_uri', redirectUri)
+  url.searchParams.set('prompt', 'select_account')
+  if (state) url.searchParams.set('state', state)
+  res.redirect(url.toString())
+})
+
+// Google OAuth callback: exchange code for tokens, verify id_token, create session token and postMessage to opener
+app.get('/auth/google/callback', async (req, res) => {
+  const code = req.query.code
+  const clientId = process.env.GOOGLE_OAUTH_CLIENT_ID
+  const clientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET
+  const redirectBase = `${req.protocol}://${req.get('host')}`
+  const redirectUri = `${redirectBase}/auth/google/callback`
+  if (!clientId || !clientSecret) {
+    return res.status(500).send('GOOGLE_OAUTH_CLIENT_ID or GOOGLE_OAUTH_CLIENT_SECRET missing on server')
+  }
+  if (!code) return res.status(400).send('Missing code')
+
+  try {
+    const params = new URLSearchParams()
+    params.set('code', code)
+    params.set('client_id', clientId)
+    params.set('client_secret', clientSecret)
+    params.set('redirect_uri', redirectUri)
+    params.set('grant_type', 'authorization_code')
+
+    const tokenResp = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString()
+    })
+    const tokenJson = await tokenResp.json()
+    const idToken = tokenJson.id_token
+    if (!idToken) {
+      return res.status(400).send('Failed to obtain id_token')
+    }
+
+    // Verify id_token
+    const verifyResp = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`)
+    const verified = await verifyResp.json()
+    const email = verified.email || ''
+    const name = verified.name || email.split('@')[0] || 'google-user'
+
+    const sessionToken = uuidv4()
+    tokens.set(sessionToken, email)
+    try { fs.mkdirSync(path.join(userLessonsDir, email), { recursive: true }) } catch (e) {}
+
+    const serverBase = `${req.protocol}://${req.get('host')}`
+
+    // Return a small HTML page that posts the token back to the opener window and closes
+    res.setHeader('Content-Type', 'text/html; charset=utf-8')
+    const safeToken = sessionToken.replace(/</g, '')
+    const safeUser = name.replace(/</g, '')
+    const safeEmail = email.replace(/</g, '')
+    const payload = JSON.stringify({ token: safeToken, username: safeUser, email: safeEmail, base: serverBase })
+    const html = `<!doctype html><html><head><meta charset="utf-8"><title>Sign in complete</title></head><body>
+    <script>
+      try {
+        if (window.opener && !window.opener.closed) {
+          window.opener.postMessage(${payload}, '*');
+          window.close();
+        } else {
+          document.body.innerText = 'Sign-in complete. Token: ' + ${JSON.stringify(safeToken)};
+        }
+      } catch (e) {
+        document.body.innerText = 'Sign-in complete. Please close this window.';
+      }
+    </script>
+    </body></html>`
+    res.send(html)
+  } catch (e) {
+    console.error('OAuth callback failed', e)
+    res.status(500).send('OAuth failed')
+  }
+})
+
 // list lessons for authenticated user
 app.get('/api/lessons', readLimiter, (req, res) => {
   const auth = req.headers.authorization || ''
@@ -468,5 +559,15 @@ app.get('/api/lessons/:id', readLimiter, (req, res) => {
   res.json(JSON.parse(fs.readFileSync(lessonPath, 'utf8')))
 })
 
-const port = process.env.PORT || 5174
+// simple token check endpoint
+app.get('/api/me', (req, res) => {
+  const auth = req.headers.authorization || ''
+  const token = auth.replace(/^Bearer\s+/, '')
+  const identity = tokens.get(token)
+  if (!identity) return res.status(401).json({ error: 'Unauthorized' })
+  // identity may be username or email depending on login flow
+  res.json({ ok: true, username: identity })
+})
+
+const port = process.env.PORT || 5188
 app.listen(port, () => console.log('Processing server running on', port))

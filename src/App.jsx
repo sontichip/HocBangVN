@@ -19,6 +19,7 @@ function App() {
   const [gameState, setGameState] = useState('login')
   const [username, setUsername] = useState('')
   const [authToken, setAuthToken] = useState('')
+  const [uploadApiBase, setUploadApiBase] = useState('')
   const [lastNonAiState, setLastNonAiState] = useState('login')
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [currentLessonIdx, setCurrentLessonIdx] = useState(null)
@@ -72,6 +73,19 @@ function App() {
         setSettings(parsedS)
       } catch(e) {}
     }
+  }, [])
+
+  // Load auth token / upload base from localStorage
+  useEffect(() => {
+    try {
+      const a = localStorage.getItem('hocbang_vn_auth')
+      if (a) {
+        const parsed = JSON.parse(a)
+        if (parsed.token) setAuthToken(parsed.token)
+        if (parsed.base) setUploadApiBase(parsed.base)
+        if (parsed.username) setUsername(parsed.username)
+      }
+    } catch (e) {}
   }, [])
 
   useEffect(() => {
@@ -153,30 +167,79 @@ function App() {
     })
   }
 
+  // Persist auth info when it changes
+  useEffect(() => {
+    try {
+      const data = { token: authToken || '', base: uploadApiBase || '', username }
+      localStorage.setItem('hocbang_vn_auth', JSON.stringify(data))
+    } catch (e) {}
+  }, [authToken, uploadApiBase, username])
+
   const handleBackToMenu = () => {
     setGameState('lesson-select')
     setCurrentLessonIdx(null)
   }
 
-  const handleSelectMode = async (mode, inputUsername) => {
-    const finalUsername = (inputUsername || '').trim()
-    if (!finalUsername) return
+  const handleSelectMode = async (mode, inputUsername, authData) => {
+    let finalUsername = (inputUsername || '').trim()
+    if (!finalUsername) {
+      finalUsername = 'Guest'
+    }
     setUsername(finalUsername)
 
+    // If authData provided (from OAuth popup), set upload base and token immediately
+    if (authData && authData.token) {
+      setUploadApiBase(authData.base || '')
+      setAuthToken(authData.token)
+      try {
+        localStorage.setItem('hocbang_vn_auth', JSON.stringify({ token: authData.token, base: authData.base || '', username: authData.username || username }))
+      } catch (e) {}
+    }
     if (mode === 'upload-ai') {
       try {
-        const res = await fetch('http://localhost:5174/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: finalUsername })
-        })
-        if (!res.ok) throw new Error('Đăng nhập backend thất bại')
-        const data = await res.json()
-        setAuthToken(data.token || '')
+        const configuredBase = import.meta.env.VITE_UPLOAD_API_BASE
+        const candidates = [configuredBase, 'http://localhost:5188', 'http://localhost:5174', 'http://localhost:5175']
+          .filter(Boolean)
+          .filter((value, idx, arr) => arr.indexOf(value) === idx)
+
+        let selected = null
+        for (const base of candidates) {
+          try {
+            const res = await fetch(`${base}/api/login`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ username: finalUsername })
+            })
+            if (!res.ok) continue
+            const data = await res.json()
+            if (data?.token) {
+              selected = { base, token: data.token }
+              break
+            }
+          } catch (err) {
+            // Try next candidate when a host/port is unavailable.
+          }
+        }
+
+        if (!selected) {
+          // don't block the user: allow entering upload UI in offline mode
+          setUploadApiBase('')
+          setAuthToken('')
+          setLastNonAiState('upload')
+          setGameState('upload')
+          return
+        }
+
+        setUploadApiBase(selected.base)
+        setAuthToken(selected.token)
         setLastNonAiState('upload')
         setGameState('upload')
       } catch (e) {
-        alert(e.message)
+        // allow user to proceed even if login fails
+        setUploadApiBase('')
+        setAuthToken('')
+        setLastNonAiState('upload')
+        setGameState('upload')
       }
       return
     }
@@ -199,6 +262,28 @@ function App() {
 
   return (
     <div className="app">
+      <div style={{ position: 'fixed', top: 12, right: 12, display: 'flex', gap: 8, alignItems: 'center', zIndex: 40 }}>
+        {username ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 18, background: '#2e7d32', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
+              {String(username).charAt(0).toUpperCase() || 'U'}
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: 13, color: '#083325' }}>{username}</div>
+              {authToken && <div style={{ fontSize: 11, color: '#4b6b5a' }}>{uploadApiBase ? new URL(uploadApiBase).host : 'connected'}</div>}
+            </div>
+          </div>
+        ) : null}
+        {authToken ? (
+          <button onClick={() => {
+            setAuthToken('')
+            setUploadApiBase('')
+            setUsername('')
+            localStorage.removeItem('hocbang_vn_auth')
+            setGameState('login')
+          }} style={{ marginLeft: 8, background: '#fff', border: '1px solid #cfeee1', color: '#0b6b3a', padding: '6px 8px', borderRadius: 8, cursor: 'pointer' }}>Đăng xuất</button>
+        ) : null}
+      </div>
       {gameState === 'login' && (
         <LoginScreen onSelectMode={handleSelectMode} />
       )}
@@ -256,7 +341,7 @@ function App() {
       )}
 
       {gameState === 'upload' && (
-        <UserContentScreen onBack={() => setGameState('login')} token={authToken} />
+        <UserContentScreen onBack={() => setGameState('login')} token={authToken} apiBase={uploadApiBase} />
       )}
 
       {gameState === 'ai-assistant' && (
@@ -289,9 +374,9 @@ function App() {
             padding: '12px 16px',
             fontWeight: 700,
             cursor: 'pointer',
-            color: '#f8fafc',
-            background: 'linear-gradient(135deg, #0284c7, #0f172a)',
-            boxShadow: '0 12px 26px rgba(0,0,0,0.35)'
+            color: '#012224',
+            background: 'linear-gradient(135deg, #2bb7d9, #0284c7)',
+            boxShadow: '0 10px 20px rgba(3,50,64,0.12)'
           }}
         >
           🤖 Hỏi AI

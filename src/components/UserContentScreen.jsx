@@ -99,7 +99,7 @@ function ActivityRenderer({ activity, disabled, token, onComplete }) {
   )
 }
 
-export default function UserContentScreen({ onBack, token }) {
+export default function UserContentScreen({ onBack, token, apiBase }) {
   const [file, setFile] = useState(null)
   const [status, setStatus] = useState('idle')
   const [result, setResult] = useState(null)
@@ -107,6 +107,8 @@ export default function UserContentScreen({ onBack, token }) {
   const [activeLessonId, setActiveLessonId] = useState(null)
   const [currentActivityIndex, setCurrentActivityIndex] = useState(0)
   const [answers, setAnswers] = useState({})
+
+  const baseUrl = apiBase || API_BASE
 
   const activeLesson = useMemo(
     () => myLessons.find((lesson) => lesson.id === activeLessonId) || null,
@@ -134,7 +136,7 @@ export default function UserContentScreen({ onBack, token }) {
     try {
       const fd = new FormData()
       fd.append('file', file)
-      const res = await fetch(`${API_BASE}/api/process`, {
+      const res = await fetch(`${baseUrl}/api/process`, {
         method: 'POST',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: fd
@@ -145,22 +147,30 @@ export default function UserContentScreen({ onBack, token }) {
       setStatus('done')
       await loadLessons()
     } catch (e) {
+      const msg = (e && e.message) ? e.message : String(e)
+      const friendly = msg.includes('Failed to fetch') || msg.includes('Network')
+        ? 'Không thể kết nối tới server tải lên. Hãy kiểm tra server đang chạy tại http://localhost:5174'
+        : msg
       setStatus('error')
-      setResult({ error: e.message })
+      setResult({ error: msg, friendly })
     }
   }
 
   const loadLessons = async () => {
     if (!token) return
     try {
-      const res = await fetch(`${API_BASE}/api/lessons`, {
+      const res = await fetch(`${baseUrl}/api/lessons`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       if (!res.ok) throw new Error('Cannot load lessons')
       const list = await res.json()
       setMyLessons(list)
     } catch (e) {
-      setResult({ error: e.message })
+      const msg = (e && e.message) ? e.message : String(e)
+      const friendly = msg.includes('Failed to fetch') || msg.includes('Network')
+        ? 'Không thể tải danh sách bài học. Kiểm tra server tại http://localhost:5174'
+        : msg
+      setResult({ error: msg, friendly })
     }
   }
 
@@ -179,16 +189,23 @@ export default function UserContentScreen({ onBack, token }) {
       <h2>Tải tài liệu của bạn lên</h2>
       <p>Hệ thống sẽ tạo bộ bài tập gồm flashcard trắc nghiệm, điền từ, ghép nối, sắp xếp câu, dictation, SRS và tự luận chấm bằng Gemini.</p>
       <input type="file" accept=".pdf,.txt,.docx,.md" onChange={handleFile} />
-      <div style={{ marginTop: 12 }}>
-        <button onClick={upload} disabled={!file || status === 'uploading'}>Gửi tập tin</button>
-        <button onClick={loadLessons} style={{ marginLeft: 8 }}>Tải danh sách bài học</button>
-        <span style={{ marginLeft: 10 }}>{status}</span>
+      <div style={{marginTop: 12}}>
+        <button
+          onClick={upload}
+          disabled={!file || status==='uploading'}
+          style={{ background: 'linear-gradient(90deg,#56cfe1,#2bb7d9)', color: '#012224', border: 'none', padding: '8px 12px', borderRadius: 8 }}
+        >
+          {status === 'uploading' ? 'Đang gửi...' : 'Gửi tập tin'}
+        </button>
+        <button onClick={loadLessons} style={{marginLeft: 8, padding: '8px 12px', borderRadius: 8}}>Tải danh sách bài học</button>
+        <span style={{marginLeft: 10, color: '#1f5160'}}>{status}</span>
       </div>
 
       {result && (
-        <div style={{ marginTop: 20 }}>
+        <div style={{marginTop: 20}}>
           <h3>Kết quả tạo bài</h3>
-          <pre style={{ whiteSpace: 'pre-wrap', maxHeight: 300, overflow: 'auto' }}>{JSON.stringify(result, null, 2)}</pre>
+          {result.friendly && <p style={{color: '#b00020'}}>{result.friendly}</p>}
+          <pre style={{whiteSpace: 'pre-wrap', maxHeight: 400, overflow: 'auto'}}>{JSON.stringify(result, null, 2)}</pre>
         </div>
       )}
 

@@ -5,6 +5,44 @@ export default function LoginScreen({ onSelectMode }) {
   const [username, setUsername] = useState('')
   const [error, setError] = useState('')
 
+  const startGoogleSignIn = () => {
+    // Try configured upload API base or common local dev host
+    const configuredBase = import.meta.env.VITE_UPLOAD_API_BASE || ''
+    const candidates = [configuredBase, 'http://localhost:5188', 'http://localhost:5174']
+      .filter(Boolean)
+      .filter((v, i, a) => a.indexOf(v) === i)
+
+    const openForBase = async (base) => {
+      try {
+        const w = window.open(`${base}/auth/google`, 'google_oauth', 'width=600,height=700')
+        if (!w) throw new Error('Popup blocked')
+
+        const listener = (e) => {
+          try {
+            if (!e.data || !e.data.token) return
+            const { token, username: u, base: serverBase } = e.data
+            window.removeEventListener('message', listener)
+            // pass authData to parent handler
+            onSelectMode('curated-ai', u || '', { token, base: serverBase || base })
+            try { w.close() } catch (e) {}
+          } catch (err) {
+            // ignore
+          }
+        }
+        window.addEventListener('message', listener)
+      } catch (e) {
+        setError('Không thể mở popup Google Sign-In.')
+      }
+    }
+
+    // try each candidate until one opens
+    for (const base of candidates) {
+      if (!base) continue
+      openForBase(base)
+      break
+    }
+  }
+
   const submit = (mode) => {
     const u = username.trim()
     if (!u) {
@@ -46,11 +84,13 @@ export default function LoginScreen({ onSelectMode }) {
           </button>
         </div>
 
+        <div style={{ marginTop: 12, textAlign: 'center' }}>
+          <button onClick={startGoogleSignIn} style={{ background: '#0b6b3a', color: '#fff', border: 'none', padding: '8px 12px', borderRadius: 8, cursor: 'pointer' }}>Đăng nhập với Google</button>
+        </div>
+
         {error && <div className="login-hub-error">{error}</div>}
 
-        <div className="login-hub-footnote">
-          Không nhập API key ở giao diện này. Key chỉ để trong file `.env` ở backend.
-        </div>
+        <div className="login-hub-footnote">Sẵn sàng học chưa? Chọn chế độ phù hợp và bắt đầu ngay.</div>
       </div>
     </div>
   )
